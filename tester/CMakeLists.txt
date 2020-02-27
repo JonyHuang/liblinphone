@@ -226,6 +226,7 @@ set(SOURCE_FILES_C
 	vcard_tester.c
 	video_tester.c
 	call_with_rtp_bundle.c
+	shared_core_tester.c
 )
 
 set(SOURCE_FILES_CXX

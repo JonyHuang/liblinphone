@@ -164,12 +164,18 @@ LinphoneCore *configure_lc_from(LinphoneCoreCbs *cbs, const char *path, Linphone
 		lp_config_set_string(config, "sound", "remote_ring", ringbackpath);
 		lp_config_set_string(config, "sound", "local_ring" , ringpath);
 		lp_config_set_string(config, "sip",   "root_ca"    , rootcapath);
-		lc = linphone_factory_create_core_with_config_3(linphone_factory_get(), config, system_context);
+
+		LinphoneCoreManager *mgr =(LinphoneCoreManager *)user_data;
+		if (mgr && mgr->group_id) {
+			lc = linphone_factory_create_shared_core_with_config(linphone_factory_get(), config, system_context, mgr->group_id, mgr->main_core);
+		} else {
+			lc = linphone_factory_create_core_with_config_3(linphone_factory_get(), config, system_context);
+		}
 	} else {
-		lc = linphone_factory_create_core_3(linphone_factory_get(), NULL, 	liblinphone_tester_get_empty_rc(), system_context);
+		lc = linphone_factory_create_core_3(linphone_factory_get(), NULL, liblinphone_tester_get_empty_rc(), system_context);
 		linphone_core_set_ring(lc, ringpath);
 		linphone_core_set_ringback(lc, ringbackpath);
-		linphone_core_set_root_ca(lc,rootcapath);
+		linphone_core_set_root_ca(lc, rootcapath);
 	}
 	if (cbs)
 		linphone_core_add_callbacks(lc, cbs);
@@ -561,12 +567,21 @@ LinphoneCoreManager* linphone_core_manager_new2(const char* rc_file, bool_t chec
 	return linphone_core_manager_new3(rc_file, check_for_proxies, NULL);
 }
 
-LinphoneCoreManager* linphone_core_manager_new( const char* rc_file) {
+LinphoneCoreManager *linphone_core_manager_new(const char *rc_file) {
 	return linphone_core_manager_new2(rc_file, TRUE);
 }
 
+LinphoneCoreManager* linphone_core_manager_new_shared(const char *rc_file, const char *group_id, bool_t main_core) {
+	LinphoneCoreManager *manager = ms_new0(LinphoneCoreManager, 1);
+	manager->group_id = ms_strdup(group_id);
+	manager->main_core = main_core;
+	linphone_core_manager_init(manager, rc_file, NULL);
+	// LinphoneCoreManager *manager = linphone_core_manager_create2(rc_file, NULL);
+	// linphone_core_manager_start(manager, NULL);
+	return manager;
+}
 
-void linphone_core_manager_stop(LinphoneCoreManager *mgr){
+void linphone_core_manager_stop(LinphoneCoreManager *mgr) {
 	if (mgr->lc) {
 		const char *record_file = linphone_core_get_record_file(mgr->lc);
 		if (!liblinphone_tester_keep_record_files && record_file && ortp_file_exist(record_file)==0) {
@@ -639,6 +654,8 @@ void linphone_core_manager_uninit(LinphoneCoreManager *mgr) {
 		unlink(mgr->lime_database_path);
 		bc_free(mgr->lime_database_path);
 	}
+	if (mgr->group_id)
+		bctbx_free(mgr->group_id);
 
 	if (mgr->cbs)
 		linphone_core_cbs_unref(mgr->cbs);

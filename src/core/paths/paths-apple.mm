@@ -23,13 +23,15 @@
 
 #import "paths-apple.h"
 
+#define TEST_GROUP_ID "test group id"
+
 // =============================================================================
 
 LINPHONE_BEGIN_NAMESPACE
 
 std::string SysPaths::getDataPath (void *context) {
 	NSString *fullPath;
-	if (context) {
+	if (context && strcmp(static_cast<const char *>(context), TEST_GROUP_ID) != 0) {
 		const char* groupId = static_cast<const char *>(context);
 		NSString *objcGroupdId = [NSString stringWithCString:groupId encoding:[NSString defaultCStringEncoding]];
 
@@ -57,7 +59,7 @@ std::string SysPaths::getDataPath (void *context) {
 
 std::string SysPaths::getConfigPath (void *context) {
 	NSString *fullPath;
-	if (context) {
+	if (context && strcmp(static_cast<const char *>(context), TEST_GROUP_ID) != 0) {
 		const char* groupId = static_cast<const char *>(context);
 		NSString *objcGroupdId = [NSString stringWithCString:groupId encoding:[NSString defaultCStringEncoding]];
 
@@ -85,7 +87,7 @@ std::string SysPaths::getConfigPath (void *context) {
 
 std::string SysPaths::getDownloadPath (void *context) {
 	NSString *fullPath;
-	if (context) {
+	if (context && strcmp(static_cast<const char *>(context), TEST_GROUP_ID) != 0) {
 		const char* groupId = static_cast<const char *>(context);
 		NSString *objcGroupdId = [NSString stringWithCString:groupId encoding:[NSString defaultCStringEncoding]];
 
