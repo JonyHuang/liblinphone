@@ -715,7 +715,6 @@ void IosPlatformHelpers::decrementMsgCounter() {
 }
 
 static void on_push_notification_message_received(LinphoneCore *lc, LinphoneChatRoom *room, LinphoneChatMessage *message) {
-	// ms_message("[push] msg received");
 	const char *contentType = linphone_chat_message_get_content_type(message);
 	if (strcmp(contentType, "text/plain") == 0 || strcmp(contentType, "image/jpeg") == 0) {
 		ms_message("[push] msg received");
@@ -844,6 +843,7 @@ bool IosPlatformHelpers::isSharedCoreStarted() {
     NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@(mAppGroup.c_str())];
     NSInteger state = [defaults integerForKey:@ACTIVE_SHARED_CORE];
 	ms_message("[SHARED] isSharedCoreStarted %d", (int) state);
+	[defaults release];
 	if (state == SharedCoreState::noCoreStarted) {
 		return false;
 	}
@@ -853,6 +853,7 @@ bool IosPlatformHelpers::isSharedCoreStarted() {
 SharedCoreState IosPlatformHelpers::getSharedCoreState() {
 	NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@(mAppGroup.c_str())];
     NSInteger state = [defaults integerForKey:@ACTIVE_SHARED_CORE];
+	[defaults release];
 	return (SharedCoreState) state;
 }
 
@@ -863,6 +864,7 @@ void IosPlatformHelpers::setSharedCoreState(SharedCoreState sharedCoreState) {
 	ms_message("[SHARED] setSharedCoreState sharedCoreState: %d", sharedCoreState);
     NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@(mAppGroup.c_str())];
     [defaults setInteger:sharedCoreState forKey:@ACTIVE_SHARED_CORE];
+	[defaults release];
 }
 
 // we need to reload the config from file at each start tp get the changes made by the other cores
