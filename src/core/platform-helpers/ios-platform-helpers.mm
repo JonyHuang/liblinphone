@@ -738,6 +738,7 @@ std::shared_ptr<ChatMessage> IosPlatformHelpers::processPushNotificationMessage(
 	chatMessage = getCore()->findChatMessageFromCallId(callId);
 	ms_message("[push] message already in db? %s", chatMessage? "yes" : "no");
 	if (chatMessage) {
+		linphone_core_cbs_unref(cbs);
 		return chatMessage;
 	}
 
@@ -749,6 +750,8 @@ std::shared_ptr<ChatMessage> IosPlatformHelpers::processPushNotificationMessage(
 
 	chatMessage = getCore()->findChatMessageFromCallId(callId);
 	ms_message("[push] message received? %s", chatMessage? "yes" : "no");
+
+	linphone_core_cbs_unref(cbs);
 	return chatMessage;
 }
 
@@ -789,6 +792,7 @@ std::shared_ptr<ChatRoom> IosPlatformHelpers::processPushNotificationChatRoomInv
 	linphone_core_add_callbacks(getCore()->getCCore(), cbs);
 
 	if (linphone_core_start(getCore()->getCCore()) != 0) {
+		linphone_core_cbs_unref(cbs);
 		return nullptr;
 	}
 	ms_message("[push] core started");
@@ -800,6 +804,7 @@ std::shared_ptr<ChatRoom> IosPlatformHelpers::processPushNotificationChatRoomInv
 		ms_usleep(50000);
 	}
 
+	linphone_core_cbs_unref(cbs);
 	return IosPlatformHelpers::chatRoomInvite;
 }
 
