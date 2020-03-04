@@ -6358,6 +6358,10 @@ static void _linphone_core_stop_async_start(LinphoneCore *lc) {
 	// if (linphone_core_get_global_state(lc) != LinphoneGlobalOn) { // TODO PAUL : it was needed for? but account manager is in state redy when it stops
 	// 	return;
 	// }
+	if (linphone_core_get_global_state(lc) == LinphoneGlobalOff) { // TODO PAUL : it was needed for? but account manager is in state redy when it stops
+		ms_message("Core is already stopped");
+		return;
+	}
 	linphone_task_list_free(&lc->hooks);
 	lc->video_conf.show_local = FALSE;
 
@@ -6385,6 +6389,10 @@ static void _linphone_core_stop_async_start(LinphoneCore *lc) {
  */
 static void _linphone_core_stop_async_end(LinphoneCore *lc) {
 	// if (linphone_core_get_global_state(lc) != LinphoneGlobalShutdown) { // TODO PAUL : it was needed for? but account manager is in state redy when it stops
+	// 	return;
+	// }
+	// if (linphone_core_get_global_state(lc) == LinphoneGlobalOff) { // TODO PAUL : it was needed for? but account manager is in state redy when it stops
+	// 	ms_message("Core is already stopped");
 	// 	return;
 	// }
 	L_GET_PRIVATE_FROM_C_OBJECT(lc)->stop();
@@ -6475,6 +6483,11 @@ static void _linphone_core_stop(LinphoneCore *lc) {
 //	if (linphone_core_get_global_state(lc) != LinphoneGlobalOn) { // TODO PAUL : it was needed for? but account manager is in state redy when it stops
 //		return;
 //	}
+
+	if (linphone_core_get_global_state(lc) == LinphoneGlobalOff) { // TODO PAUL : it was needed for? but account manager is in state redy when it stops
+		ms_message("Core is already stopped");
+		return;
+	}
 
 	_linphone_core_stop_async_start(lc);
 

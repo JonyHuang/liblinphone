@@ -375,6 +375,7 @@ typedef struct _LinphoneCallTestParams {
 void liblinphone_tester_add_suites(void);
 
 void linphone_core_manager_init(LinphoneCoreManager *mgr, const char* rc_file, const char* phone_alias);
+LinphoneCore *linphone_core_manager_configure_lc(LinphoneCoreManager *mgr);
 void linphone_core_manager_configure (LinphoneCoreManager *mgr);
 void linphone_core_manager_start(LinphoneCoreManager *mgr, bool_t check_for_proxies);
 LinphoneCoreManager* linphone_core_manager_create2(const char* rc_file, const char* phone_alias);
@@ -383,7 +384,7 @@ LinphoneCoreManager* linphone_core_manager_new4(const char* rc_file, int check_f
 LinphoneCoreManager* linphone_core_manager_new3(const char* rc_file, bool_t check_for_proxies, const char* phone_alias);
 LinphoneCoreManager* linphone_core_manager_new2(const char* rc_file, bool_t check_for_proxies);
 LinphoneCoreManager* linphone_core_manager_new(const char* rc_file);
-LinphoneCoreManager* linphone_core_manager_new_shared(const char *rc_file, const char *group_id, bool_t main_core);
+LinphoneCoreManager* linphone_core_manager_create_shared(const char *rc_file, const char *group_id, bool_t main_core);
 void linphone_core_manager_stop(LinphoneCoreManager *mgr);
 void linphone_core_manager_uninit_after_stop_async(LinphoneCoreManager *mgr);
 void linphone_core_manager_reinit(LinphoneCoreManager *mgr);

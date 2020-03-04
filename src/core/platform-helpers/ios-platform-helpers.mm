@@ -103,6 +103,7 @@ public:
 	bool canCoreStart() override;
 	void onCoreMustStop();
 	static string getSharedPath(const string &groupId, const string &fileName);
+	void resetSharedCoreState() override;
 
 	// push notif
 	void resetMsgCounter();
@@ -730,7 +731,8 @@ std::shared_ptr<ChatMessage> IosPlatformHelpers::processPushNotificationMessage(
  	linphone_core_cbs_set_message_received(cbs, on_push_notification_message_received);
 	linphone_core_add_callbacks(getCore()->getCCore(), cbs);
 
-	if (linphone_core_start(getCore()->getCCore()) != 0) {
+	if (linphone_core_get_global_state(getCore()->getCCore()) != LinphoneGlobalOn && linphone_core_start(getCore()->getCCore()) != 0) {
+		linphone_core_cbs_unref(cbs);
 		return nullptr;
 	}
 	ms_message("[push] core started");
@@ -791,14 +793,14 @@ std::shared_ptr<ChatRoom> IosPlatformHelpers::processPushNotificationChatRoomInv
 	linphone_core_cbs_set_chat_room_state_changed(cbs, on_push_notification_chat_room_invite_received);
 	linphone_core_add_callbacks(getCore()->getCCore(), cbs);
 
-	if (linphone_core_start(getCore()->getCCore()) != 0) {
+	if (linphone_core_get_global_state(getCore()->getCCore()) != LinphoneGlobalOn && linphone_core_start(getCore()->getCCore()) != 0) {
 		linphone_core_cbs_unref(cbs);
 		return nullptr;
 	}
 	ms_message("[push] core started");
 
 	reinitTimer();
-	while (!IosPlatformHelpers::chatRoomInvite || (ms_get_cur_time_ms() - IosPlatformHelpers::timer < 1000)) {
+	while (!IosPlatformHelpers::chatRoomInvite && (ms_get_cur_time_ms() - IosPlatformHelpers::timer < 1000)) {
 		ms_message("[push] wait chatRoom");
 		linphone_core_iterate(getCore()->getCCore());
 		ms_usleep(50000);
@@ -872,6 +874,10 @@ void IosPlatformHelpers::setSharedCoreState(SharedCoreState sharedCoreState) {
 	[defaults release];
 }
 
+void IosPlatformHelpers::resetSharedCoreState() {
+	setSharedCoreState(SharedCoreState::noCoreStarted);
+}
+
 // we need to reload the config from file at each start tp get the changes made by the other cores
 void IosPlatformHelpers::reloadConfig() {
 	// if we just created the core, we don't need to reload the config
@@ -900,8 +906,9 @@ bool IosPlatformHelpers::canExecutorCoreStart() {
 
 void IosPlatformHelpers::subscribeToMainCoreNotifs() {
 	ms_message("[SHARED] subscribeToMainCoreNotifs");
-   	CFNotificationCenterRef notification = CFNotificationCenterGetDarwinNotifyCenter ();
+   	CFNotificationCenterRef notification = CFNotificationCenterGetDarwinNotifyCenter();
    	CFNotificationCenterAddObserver(notification, (__bridge const void *)(this), on_core_must_stop, CFSTR(ACTIVE_SHARED_CORE), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
+	//    CFNotificationSuspensionBehaviorCoalesce
 }
 
 void on_core_must_stop(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {

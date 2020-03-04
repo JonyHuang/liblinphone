@@ -186,4 +186,6 @@ std::shared_ptr<ChatRoom> GenericPlatformHelpers::getPushNotificationChatRoomInv
 	return nullptr;
 }
 
+void GenericPlatformHelpers::resetSharedCoreState() {}
+
 LINPHONE_END_NAMESPACE
