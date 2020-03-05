@@ -800,7 +800,7 @@ std::shared_ptr<ChatRoom> IosPlatformHelpers::processPushNotificationChatRoomInv
 	ms_message("[push] core started");
 
 	reinitTimer();
-	while (!IosPlatformHelpers::chatRoomInvite && (ms_get_cur_time_ms() - IosPlatformHelpers::timer < 1000)) {
+	while (!IosPlatformHelpers::chatRoomInvite || (ms_get_cur_time_ms() - IosPlatformHelpers::timer < 1000)) {
 		ms_message("[push] wait chatRoom");
 		linphone_core_iterate(getCore()->getCCore());
 		ms_usleep(50000);

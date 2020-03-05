@@ -6484,7 +6484,7 @@ static void _linphone_core_stop(LinphoneCore *lc) {
 //		return;
 //	}
 
-	if (linphone_core_get_global_state(lc) == LinphoneGlobalOff) { // TODO PAUL : it was needed for? but account manager is in state redy when it stops
+	if (linphone_core_get_global_state(lc) == LinphoneGlobalOff) { // TODO PAUL : it was needed for? but account manager is in state ready when it stops
 		ms_message("Core is already stopped");
 		return;
 	}
